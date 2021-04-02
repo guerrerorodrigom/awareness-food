@@ -40,6 +40,9 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET
 import android.net.NetworkRequest
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.OnLifecycleEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -47,7 +50,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class NetworkMonitor @Inject constructor(private val context: Context) {
+class NetworkMonitor @Inject constructor(private val context: Context) : LifecycleObserver {
 
   private lateinit var networkCallback: ConnectivityManager.NetworkCallback
   private var connectivityManager: ConnectivityManager? = null
@@ -60,17 +63,20 @@ class NetworkMonitor @Inject constructor(private val context: Context) {
   val networkAvailableStateFlow
     get() = _networkAvailableStateFlow
 
+  @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
   fun init() {
     connectivityManager =
         context.getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
   }
 
+  @OnLifecycleEvent(Lifecycle.Event.ON_START)
   fun registerNetworkCallback() {
     initCoroutine()
     initNetworkMonitoring()
     checkCurrentNetworkState()
   }
 
+  @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
   fun unregisterNetworkCallback() {
     validNetworks.clear()
     connectivityManager?.unregisterNetworkCallback(networkCallback)

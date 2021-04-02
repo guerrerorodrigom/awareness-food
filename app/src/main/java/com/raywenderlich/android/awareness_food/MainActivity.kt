@@ -74,15 +74,13 @@ class MainActivity : AppCompatActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     AndroidInjection.inject(this)
-    // Switch to AppTheme for displaying the activity
     setTheme(R.style.AppTheme)
-
     super.onCreate(savedInstanceState)
-
     binding = ActivityMainBinding.inflate(layoutInflater)
     setContentView(binding.root)
 
-    // Your code
+    lifecycle.addObserver(networkMonitor)
+
     viewModel.loadingState.observe(this, Observer { uiLoadingState ->
       binding.progressBar.isVisible = when (uiLoadingState) {
         UiLoadingState.Loading -> true
@@ -98,23 +96,12 @@ class MainActivity : AppCompatActivity() {
 
     })
     viewModel.getRandomRecipe()
-    networkMonitor.init()
 
     networkMonitor.networkAvailableStateFlow.asLiveData().observe(this, Observer { networkState ->
       if (networkState is NetworkState.Unavailable) {
         showNetworkUnavailableAlert(R.string.network_is_unavailable)
       }
     })
-  }
-
-  override fun onStart() {
-    super.onStart()
-    networkMonitor.registerNetworkCallback()
-  }
-
-  override fun onStop() {
-    super.onStop()
-    networkMonitor.unregisterNetworkCallback()
   }
 
   override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
