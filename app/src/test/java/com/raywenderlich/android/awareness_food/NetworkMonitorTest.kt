@@ -34,13 +34,55 @@
 
 package com.raywenderlich.android.awareness_food
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LifecycleRegistry
+import com.raywenderlich.android.awareness_food.monitor.NetworkMonitor
+import io.mockk.mockk
+import io.mockk.verify
+import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
-
-import org.junit.Assert.*
+import org.junit.rules.TestRule
 
 class NetworkMonitorTest {
+
+  private val lifecycleOwner = mockk<LifecycleOwner>(relaxed = true)
+  private val networkMonitor = mockk<NetworkMonitor>(relaxed = true)
+
+  private lateinit var lifecycle: LifecycleRegistry
+
+  @get:Rule
+  var rule: TestRule = InstantTaskExecutorRule()
+
+  @Before
+  fun setup() {
+    lifecycle = LifecycleRegistry(lifecycleOwner)
+    lifecycle.addObserver(networkMonitor)
+  }
+
   @Test
-  fun addition_isCorrect() {
-    assertEquals(4, 2 + 2)
+  fun `When On Create lifecycle event is executed, init() is called`() {
+    lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
+
+    verify { networkMonitor.init() }
+  }
+
+  @Test
+  fun `When On Start lifecycle event is executed, registerNetworkCallback() is called`() {
+    lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
+    lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_START)
+
+    verify { networkMonitor.registerNetworkCallback() }
+  }
+
+  @Test
+  fun `When On Stop lifecycle event is executed, unregisterNetworkCallback() is called`() {
+    lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
+    lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_START)
+    lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
+
+    verify { networkMonitor.unregisterNetworkCallback() }
   }
 }
