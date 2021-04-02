@@ -159,11 +159,12 @@ class MainActivity : AppCompatActivity() {
   }
 
   private fun showNetworkUnavailableAlert(message: Int) {
-    val snackbar = Snackbar.make(binding.root, message, Snackbar.LENGTH_INDEFINITE)
+    Snackbar.make(binding.root, message, Snackbar.LENGTH_INDEFINITE)
         .setAction(R.string.retry) {
           viewModel.getRandomRecipe()
+        }.apply {
+          view.setBackgroundColor(ContextCompat.getColor(this@MainActivity, R.color.colorPrimary))
+          show()
         }
-    snackbar.view.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary))
-    snackbar.show()
   }
 }
