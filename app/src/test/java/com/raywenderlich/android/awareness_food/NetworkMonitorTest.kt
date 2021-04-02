@@ -34,18 +34,18 @@
 
 package com.raywenderlich.android.awareness_food
 
-import org.junit.Test
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import org.junit.Before
+import org.junit.Rule
+import org.junit.rules.TestRule
 
-import org.junit.Assert.*
+class NetworkMonitorTest {
 
-/**
- * Example local unit test, which will execute on the development machine (host).
- *
- * See [testing documentation](http://d.android.com/tools/testing).
- */
-class ExampleUnitTest {
-  @Test
-  fun addition_isCorrect() {
-    assertEquals(4, 2 + 2)
+  @get:Rule
+  var rule: TestRule = InstantTaskExecutorRule()
+
+  @Before
+  fun setup() {
+
   }
 }
