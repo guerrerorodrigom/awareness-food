@@ -35,22 +35,100 @@
 package com.raywenderlich.android.awareness_food
 
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.text.HtmlCompat
+import androidx.core.view.isVisible
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import com.raywenderlich.android.awareness_food.data.Recipe
+import com.raywenderlich.android.awareness_food.databinding.ActivityMainBinding
+import com.raywenderlich.android.awareness_food.repositories.models.RecipeApiState
+import com.raywenderlich.android.awareness_food.viewmodels.MainViewModel
+import com.raywenderlich.android.awareness_food.viewmodels.UiLoadingState
+import com.raywenderlich.android.awareness_food.views.IngredientView
+import com.squareup.picasso.Picasso
+import dagger.android.AndroidInjection
+import javax.inject.Inject
 
 /**
  * Main Screen
  */
 class MainActivity : AppCompatActivity() {
 
+  @Inject
+  lateinit var viewModelFactory: ViewModelProvider.Factory
+  private val viewModel: MainViewModel by viewModels { viewModelFactory }
+
+  private lateinit var binding: ActivityMainBinding
+
   override fun onCreate(savedInstanceState: Bundle?) {
+    AndroidInjection.inject(this)
     // Switch to AppTheme for displaying the activity
     setTheme(R.style.AppTheme)
 
     super.onCreate(savedInstanceState)
-    setContentView(R.layout.activity_main)
+
+    binding = ActivityMainBinding.inflate(layoutInflater)
+    setContentView(binding.root)
 
     // Your code
+    viewModel.loadingState.observe(this, Observer { uiLoadingState ->
+      binding.progressBar.isVisible = when (uiLoadingState) {
+        UiLoadingState.Loading -> true
+        UiLoadingState.NotLoading -> false
+      }
+    })
 
+    viewModel.recipeState.observe(this, Observer {
+      when (it) {
+        RecipeApiState.Error -> {
+        }
+        is RecipeApiState.Result -> buildViews(it.recipe)
+      }
 
+    })
+    viewModel.getRandomRecipe()
+  }
+
+  override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
+    R.id.menu_refresh -> {
+      clearViews()
+      viewModel.getRandomRecipe()
+      true
+    }
+    else -> super.onOptionsItemSelected(item)
+  }
+
+  override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    menuInflater.inflate(R.menu.main_menu, menu)
+    return true
+  }
+
+  private fun buildViews(recipe: Recipe) {
+    with(binding) {
+      recipeInstructionsTitle.text = getString(R.string.instructions)
+      recipeIngredientsTitle.text = getString(R.string.ingredients)
+      recipeName.text = recipe.title
+      recipeSummary.text = HtmlCompat.fromHtml(recipe.summary, 0)
+      recipeInstructions.text = HtmlCompat.fromHtml(recipe.instructions, 0)
+      Picasso.with(this@MainActivity).load(recipe.image).into(recipeImage)
+      recipe.ingredients.forEach { ingredient ->
+        val ingredientView = IngredientView(this@MainActivity, ingredient)
+        recipeIngredients.addView(ingredientView)
+      }
+    }
+  }
+
+  private fun clearViews() {
+    with(binding) {
+      recipeName.text = ""
+      recipeSummary.text = ""
+      recipeInstructions.text = ""
+      recipeImage.setImageDrawable(null)
+      recipeInstructionsTitle.text = ""
+    }
   }
 }
