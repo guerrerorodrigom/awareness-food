@@ -39,12 +39,17 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.asLiveData
+import com.google.android.material.snackbar.Snackbar
 import com.raywenderlich.android.awareness_food.data.Recipe
 import com.raywenderlich.android.awareness_food.databinding.ActivityMainBinding
+import com.raywenderlich.android.awareness_food.monitor.NetworkMonitor
+import com.raywenderlich.android.awareness_food.monitor.NetworkState
 import com.raywenderlich.android.awareness_food.repositories.models.RecipeApiState
 import com.raywenderlich.android.awareness_food.viewmodels.MainViewModel
 import com.raywenderlich.android.awareness_food.viewmodels.UiLoadingState
@@ -60,8 +65,11 @@ class MainActivity : AppCompatActivity() {
 
   @Inject
   lateinit var viewModelFactory: ViewModelProvider.Factory
-  private val viewModel: MainViewModel by viewModels { viewModelFactory }
 
+  @Inject
+  lateinit var networkMonitor: NetworkMonitor
+
+  private val viewModel: MainViewModel by viewModels { viewModelFactory }
   private lateinit var binding: ActivityMainBinding
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -84,13 +92,29 @@ class MainActivity : AppCompatActivity() {
 
     viewModel.recipeState.observe(this, Observer {
       when (it) {
-        RecipeApiState.Error -> {
-        }
+        RecipeApiState.Error -> showNetworkUnavailableAlert(R.string.error)
         is RecipeApiState.Result -> buildViews(it.recipe)
       }
 
     })
     viewModel.getRandomRecipe()
+    networkMonitor.init()
+
+    networkMonitor.networkAvailableStateFlow.asLiveData().observe(this, Observer { networkState ->
+      if (networkState is NetworkState.Unavailable) {
+        showNetworkUnavailableAlert(R.string.network_is_unavailable)
+      }
+    })
+  }
+
+  override fun onStart() {
+    super.onStart()
+    networkMonitor.registerNetworkCallback()
+  }
+
+  override fun onStop() {
+    super.onStop()
+    networkMonitor.unregisterNetworkCallback()
   }
 
   override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
@@ -115,8 +139,8 @@ class MainActivity : AppCompatActivity() {
       recipeSummary.text = HtmlCompat.fromHtml(recipe.summary, 0)
       recipeInstructions.text = HtmlCompat.fromHtml(recipe.instructions, 0)
       Picasso.with(this@MainActivity).load(recipe.image).into(recipeImage)
-      recipe.ingredients.forEach { ingredient ->
-        val ingredientView = IngredientView(this@MainActivity, ingredient)
+      recipe.ingredients.forEachIndexed { index, ingredient ->
+        val ingredientView = IngredientView(this@MainActivity, ingredient, index != 0)
         recipeIngredients.addView(ingredientView)
       }
     }
@@ -128,7 +152,18 @@ class MainActivity : AppCompatActivity() {
       recipeSummary.text = ""
       recipeInstructions.text = ""
       recipeImage.setImageDrawable(null)
+      recipeIngredientsTitle.text = ""
+      recipeIngredients.removeAllViews()
       recipeInstructionsTitle.text = ""
     }
+  }
+
+  private fun showNetworkUnavailableAlert(message: Int) {
+    val snackbar = Snackbar.make(binding.root, message, Snackbar.LENGTH_INDEFINITE)
+        .setAction(R.string.retry) {
+          viewModel.getRandomRecipe()
+        }
+    snackbar.view.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimary))
+    snackbar.show()
   }
 }

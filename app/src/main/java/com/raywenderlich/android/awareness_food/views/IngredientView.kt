@@ -35,13 +35,12 @@
 package com.raywenderlich.android.awareness_food.views
 
 import android.content.Context
-import android.graphics.Color
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
-import android.widget.RelativeLayout
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import com.google.android.material.textview.MaterialTextView
 import com.raywenderlich.android.awareness_food.R
 import com.raywenderlich.android.awareness_food.data.Ingredient
@@ -51,6 +50,7 @@ import com.squareup.picasso.Picasso
 class IngredientView @JvmOverloads constructor(
     context: Context,
     private val ingredient: Ingredient,
+    private val showDivider: Boolean,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
@@ -65,13 +65,18 @@ class IngredientView @JvmOverloads constructor(
 
     ingredientName.text = context.getString(R.string.ingredient, ingredient.amount, ingredient.unit, ingredient.name)
     Picasso.with(context).load(ingredient.imageUrl).into(ingredientImage)
+
+    if (showDivider) {
+      addDivider()
+    }
   }
 
   private fun addDivider() {
-    val viewDivider = View(context)
-    val dividerHeight = (resources.displayMetrics.density * 1).toInt() // 1dp to pixels
+    val divider = View(context)
+    val dividerHeight = (resources.displayMetrics.density * 1).toInt()
 
-    viewDivider.layoutParams = RelativeLayLayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dividerHeight)
-    viewDivider.setBackgroundColor(context(R.color.colorDivider));
+    divider.layoutParams = LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dividerHeight)
+    divider.setBackgroundColor(ContextCompat.getColor(context, R.color.colorDivider))
+    addView(divider)
   }
 }

@@ -36,6 +36,7 @@ package com.raywenderlich.android.awareness_food
 
 import android.app.Application
 import com.raywenderlich.android.awareness_food.di.DaggerAppComponent
+import com.raywenderlich.android.awareness_food.di.RecipesModule
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasAndroidInjector
@@ -48,9 +49,11 @@ class RecipesApplication : Application(), HasAndroidInjector {
 
   override fun onCreate() {
     super.onCreate()
-    DaggerAppComponent.builder().build().run {
-      inject(this@RecipesApplication)
-    }
+    DaggerAppComponent.builder()
+        .recipesModule(RecipesModule(applicationContext))
+        .build().run {
+          inject(this@RecipesApplication)
+        }
   }
 
   override fun androidInjector(): AndroidInjector<Any> = androidInjector

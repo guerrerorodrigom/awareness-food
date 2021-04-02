@@ -34,6 +34,7 @@
 
 package com.raywenderlich.android.awareness_food.di
 
+import android.content.Context
 import com.raywenderlich.android.awareness_food.network.RecipesService
 import com.raywenderlich.android.awareness_food.repositories.RecipeRepository
 import com.raywenderlich.android.awareness_food.repositories.RecipeRepositoryImpl
@@ -48,7 +49,7 @@ import javax.inject.Singleton
 private const val API_KEY = "e295663f51e34f37b48f90afbc84a644"
 
 @Module
-class RecipesModule {
+class RecipesModule(val context: Context) {
 
   @Singleton
   @Provides
@@ -75,4 +76,8 @@ class RecipesModule {
   @Singleton
   @Provides
   fun providesRecipeRepository(recipesService: RecipesService): RecipeRepository = RecipeRepositoryImpl(recipesService)
+
+  @Singleton
+  @Provides
+  fun providesContext() = context
 }
