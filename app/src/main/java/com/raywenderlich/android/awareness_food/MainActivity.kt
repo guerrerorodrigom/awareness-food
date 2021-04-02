@@ -82,9 +82,12 @@ class MainActivity : AppCompatActivity() {
     lifecycle.addObserver(networkMonitor)
 
     viewModel.loadingState.observe(this, Observer { uiLoadingState ->
-      binding.progressBar.isVisible = when (uiLoadingState) {
-        UiLoadingState.Loading -> true
-        UiLoadingState.NotLoading -> false
+      when (uiLoadingState) {
+        UiLoadingState.Loading -> {
+          clearViews()
+          binding.progressBar.isVisible = true
+        }
+        UiLoadingState.NotLoading -> binding.progressBar.isVisible = false
       }
     })
 
