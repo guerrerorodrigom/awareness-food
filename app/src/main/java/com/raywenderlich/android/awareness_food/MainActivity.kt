@@ -101,6 +101,7 @@ class MainActivity : AppCompatActivity() {
 
     })
     viewModel.getRandomRecipe()
+    // 1.Network Monitor initialization.
     networkMonitor.init()
 
     networkMonitor.networkAvailableStateFlow.asLiveData().observe(this, Observer { networkState ->
@@ -110,11 +111,13 @@ class MainActivity : AppCompatActivity() {
     })
   }
 
+  // 2. Register network callback.
   override fun onStart() {
     super.onStart()
     networkMonitor.registerNetworkCallback()
   }
 
+  // 3. Unregister network callback.
   override fun onStop() {
     super.onStop()
     networkMonitor.unregisterNetworkCallback()
