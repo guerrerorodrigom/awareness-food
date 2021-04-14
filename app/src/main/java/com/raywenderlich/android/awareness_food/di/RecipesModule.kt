@@ -46,7 +46,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
-private const val API_KEY = "e295663f51e34f37b48f90afbc84a644"
+private const val API_KEY = "YOUR_API_KEY_HERE"
 
 @Module
 class RecipesModule(val context: Context) {
