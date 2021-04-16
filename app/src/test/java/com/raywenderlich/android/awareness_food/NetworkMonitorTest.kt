@@ -63,23 +63,21 @@ class NetworkMonitorTest {
   }
 
   @Test
-  fun `When On Create lifecycle event is executed, init() is called`() {
+  fun `When dispatching On Create lifecycle event, call init()`() {
     lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
 
     verify { networkMonitor.init() }
   }
 
   @Test
-  fun `When On Start lifecycle event is executed, registerNetworkCallback() is called`() {
-    lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
+  fun `When dispatching On Start lifecycle event, call registerNetworkCallback()`() {
     lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_START)
 
     verify { networkMonitor.registerNetworkCallback() }
   }
 
   @Test
-  fun `When On Stop lifecycle event is executed, unregisterNetworkCallback() is called`() {
-    lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
+  fun `When dispatching On Stop lifecycle event, call unregisterNetworkCallback()`() {
     lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_START)
     lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
 
