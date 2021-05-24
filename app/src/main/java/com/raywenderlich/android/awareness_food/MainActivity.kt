@@ -128,9 +128,13 @@ class MainActivity : AppCompatActivity() {
       recipeName.text = recipe.title
       recipeSummary.text = HtmlCompat.fromHtml(recipe.summary, 0)
       recipeInstructions.text = HtmlCompat.fromHtml(recipe.instructions, 0)
-      Picasso.with(this@MainActivity).load(recipe.image).into(recipeImage)
+      Picasso.get().load(recipe.image).into(recipeImage)
       recipe.ingredients.forEachIndexed { index, ingredient ->
-        val ingredientView = IngredientView(this@MainActivity, ingredient, index != 0)
+        val ingredientView = IngredientView(this@MainActivity)
+        ingredientView.setIngredient(ingredient)
+        if (index != 0) {
+          ingredientView.addDivider()
+        }
         recipeIngredients.addView(ingredientView)
       }
     }

@@ -48,30 +48,24 @@ import com.squareup.picasso.Picasso
 
 
 class IngredientView @JvmOverloads constructor(
-    context: Context,
-    private val ingredient: Ingredient,
-    private val showDivider: Boolean,
-    attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0,
+  context: Context,
+  attrs: AttributeSet? = null,
+  defStyleAttr: Int = 0,
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
+
   init {
-    init()
+    View.inflate(context, R.layout.ingredient_item, this)
   }
 
-  private fun init() {
-    View.inflate(context, R.layout.ingredient_item, this)
+  fun setIngredient(ingredient: Ingredient) {
     val ingredientName = findViewById<MaterialTextView>(R.id.ingredient_name)
     val ingredientImage = findViewById<AppCompatImageView>(R.id.ingredient_image)
 
     ingredientName.text = context.getString(R.string.ingredient, ingredient.amount, ingredient.unit, ingredient.name)
-    Picasso.with(context).load(ingredient.imageUrl).into(ingredientImage)
-
-    if (showDivider) {
-      addDivider()
-    }
+    Picasso.get().load(ingredient.imageUrl).into(ingredientImage)
   }
 
-  private fun addDivider() {
+  fun addDivider() {
     val divider = View(context)
     val dividerHeight = (resources.displayMetrics.density * 1).toInt()
 
