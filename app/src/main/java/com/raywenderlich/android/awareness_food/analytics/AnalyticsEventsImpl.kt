@@ -32,58 +32,18 @@
  * THE SOFTWARE.
  */
 
-package com.raywenderlich.android.awareness_food.di
+package com.raywenderlich.android.awareness_food.analytics
 
-import android.content.Context
-import com.raywenderlich.android.awareness_food.analytics.AnalyticsEvents
-import com.raywenderlich.android.awareness_food.analytics.AnalyticsEventsImpl
-import com.raywenderlich.android.awareness_food.network.RecipesService
-import com.raywenderlich.android.awareness_food.repositories.RecipeRepository
-import com.raywenderlich.android.awareness_food.repositories.RecipeRepositoryImpl
-import dagger.Module
-import dagger.Provides
-import okhttp3.OkHttpClient
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import java.util.concurrent.TimeUnit
-import javax.inject.Singleton
+import android.util.Log
+import javax.inject.Inject
 
-private const val API_KEY = "YOUR_API_KEY_HERE"
+class AnalyticsEventsImpl @Inject constructor() : AnalyticsEvents {
 
-@Module
-class RecipesModule(val context: Context) {
-
-  @Singleton
-  @Provides
-  fun providesRetrofitService(): RecipesService {
-    val okHttpClient = OkHttpClient.Builder()
-        .connectTimeout(30, TimeUnit.SECONDS)
-        .readTimeout(30, TimeUnit.SECONDS)
-        .addInterceptor { chain ->
-          val url = chain.request().url().newBuilder()
-              .addQueryParameter("apiKey", API_KEY)
-              .build()
-
-          val requestBuilder = chain.request().newBuilder().url(url)
-          chain.proceed(requestBuilder.build())
-        }
-        .build()
-    val builder = Retrofit.Builder()
-        .client(okHttpClient)
-        .baseUrl("https://api.spoonacular.com/")
-        .addConverterFactory(GsonConverterFactory.create())
-    return builder.build().create(RecipesService::class.java)
+  companion object {
+    private const val TAG = "APP_LOGGER"
   }
 
-  @Singleton
-  @Provides
-  fun providesRecipeRepository(recipesService: RecipesService): RecipeRepository = RecipeRepositoryImpl(recipesService)
-
-  @Singleton
-  @Provides
-  fun providesContext() = context
-
-  @Singleton
-  @Provides
-  fun providesAnalytics(): AnalyticsEvents = AnalyticsEventsImpl()
+  override fun trackAppEvent(event: String) {
+    Log.i(TAG, "App is going to $event")
+  }
 }
