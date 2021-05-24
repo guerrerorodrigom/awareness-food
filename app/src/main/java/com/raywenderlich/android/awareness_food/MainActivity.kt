@@ -66,8 +66,7 @@ class MainActivity : AppCompatActivity() {
   @Inject
   lateinit var viewModelFactory: ViewModelProvider.Factory
 
-  @Inject
-  lateinit var networkMonitor: NetworkMonitor
+  private lateinit var networkMonitor: NetworkMonitor
 
   private val viewModel: MainViewModel by viewModels { viewModelFactory }
   private lateinit var binding: ActivityMainBinding
@@ -79,6 +78,7 @@ class MainActivity : AppCompatActivity() {
     binding = ActivityMainBinding.inflate(layoutInflater)
     setContentView(binding.root)
 
+    networkMonitor = NetworkMonitor(this, lifecycle)
     lifecycle.addObserver(networkMonitor)
 
     viewModel.loadingState.observe(this, Observer { uiLoadingState ->

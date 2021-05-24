@@ -48,9 +48,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-class NetworkMonitor @Inject constructor(private val context: Context) : LifecycleObserver {
+class NetworkMonitor constructor(
+  private val context: Context,
+  private val lifecycle: Lifecycle
+) : LifecycleObserver {
 
   private lateinit var networkCallback: ConnectivityManager.NetworkCallback
   private var connectivityManager: ConnectivityManager? = null
@@ -71,9 +73,11 @@ class NetworkMonitor @Inject constructor(private val context: Context) : Lifecyc
 
   @OnLifecycleEvent(Lifecycle.Event.ON_START)
   fun registerNetworkCallback() {
-    initCoroutine()
-    initNetworkMonitoring()
-    checkCurrentNetworkState()
+    if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+      initCoroutine()
+      initNetworkMonitoring()
+      checkCurrentNetworkState()
+    }
   }
 
   @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
