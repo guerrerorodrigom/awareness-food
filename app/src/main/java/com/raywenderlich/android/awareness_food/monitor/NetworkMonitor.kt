@@ -47,7 +47,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class NetworkMonitor @Inject constructor(private val context: Context) {
+class NetworkMonitor constructor(private val context: Context) {
 
   private lateinit var networkCallback: ConnectivityManager.NetworkCallback
   private var connectivityManager: ConnectivityManager? = null
