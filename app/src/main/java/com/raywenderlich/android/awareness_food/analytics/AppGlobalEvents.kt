@@ -34,22 +34,10 @@
 
 package com.raywenderlich.android.awareness_food.analytics
 
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
 import javax.inject.Inject
 
 class AppGlobalEvents @Inject constructor(
   private val analyticsEvents: AnalyticsEvents
-) : LifecycleObserver {
+) {
 
-  @OnLifecycleEvent(Lifecycle.Event.ON_START)
-  fun onAppToForeground() {
-    analyticsEvents.trackAppEvent("foreground")
-  }
-
-  @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-  fun onAppToBackground() {
-    analyticsEvents.trackAppEvent("background")
-  }
 }

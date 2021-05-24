@@ -35,10 +35,8 @@
 package com.raywenderlich.android.awareness_food
 
 import android.app.Application
-import androidx.lifecycle.ProcessLifecycleOwner
 import com.raywenderlich.android.awareness_food.di.DaggerAppComponent
 import com.raywenderlich.android.awareness_food.di.RecipesModule
-import com.raywenderlich.android.awareness_food.analytics.AppGlobalEvents
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasAndroidInjector
@@ -48,8 +46,6 @@ class RecipesApplication : Application(), HasAndroidInjector {
 
   @Inject
   lateinit var androidInjector: DispatchingAndroidInjector<Any>
-  @Inject
-  lateinit var appGlobalEvents: AppGlobalEvents
 
   override fun onCreate() {
     super.onCreate()
@@ -58,8 +54,6 @@ class RecipesApplication : Application(), HasAndroidInjector {
         .build().run {
           inject(this@RecipesApplication)
         }
-
-    ProcessLifecycleOwner.get().lifecycle.addObserver(appGlobalEvents)
   }
 
   override fun androidInjector(): AndroidInjector<Any> = androidInjector
