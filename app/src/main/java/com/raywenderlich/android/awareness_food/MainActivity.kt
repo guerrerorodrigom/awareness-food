@@ -70,6 +70,7 @@ class MainActivity : AppCompatActivity() {
 
   private val viewModel: MainViewModel by viewModels { viewModelFactory }
   private lateinit var binding: ActivityMainBinding
+  private var snackbar: Snackbar? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
     AndroidInjection.inject(this)
@@ -106,8 +107,8 @@ class MainActivity : AppCompatActivity() {
     networkMonitor.init()
 
     networkMonitor.networkAvailableStateFlow.asLiveData().observe(this, Observer { networkState ->
-      if (networkState is NetworkState.Unavailable) {
-        showNetworkUnavailableAlert(R.string.network_is_unavailable)
+      when (networkState) {
+        NetworkState.Unavailable -> showNetworkUnavailableAlert(R.string.network_is_unavailable)
       }
     })
   }
@@ -170,7 +171,7 @@ class MainActivity : AppCompatActivity() {
   }
 
   private fun showNetworkUnavailableAlert(message: Int) {
-    Snackbar.make(binding.root, message, Snackbar.LENGTH_INDEFINITE)
+    snackbar = Snackbar.make(binding.root, message, Snackbar.LENGTH_INDEFINITE)
         .setAction(R.string.retry) {
           viewModel.getRandomRecipe()
         }.apply {
