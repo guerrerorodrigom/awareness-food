@@ -45,7 +45,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 class NetworkMonitor constructor(private val context: Context) {
 
