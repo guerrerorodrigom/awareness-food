@@ -45,11 +45,15 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.Lifecycle
 import com.google.android.material.snackbar.Snackbar
 import com.raywenderlich.android.awareness_food.data.Recipe
 import com.raywenderlich.android.awareness_food.databinding.ActivityMainBinding
 import com.raywenderlich.android.awareness_food.monitor.NetworkMonitor
 import com.raywenderlich.android.awareness_food.monitor.NetworkState
+import com.raywenderlich.android.awareness_food.monitor.UnavailableConnectionLifecycleOwner
 import com.raywenderlich.android.awareness_food.repositories.models.RecipeApiState
 import com.raywenderlich.android.awareness_food.viewmodels.MainViewModel
 import com.raywenderlich.android.awareness_food.viewmodels.UiLoadingState
@@ -65,11 +69,15 @@ class MainActivity : AppCompatActivity() {
 
   @Inject
   lateinit var viewModelFactory: ViewModelProvider.Factory
+  @Inject
+  lateinit var unavailableConnectionLifecycleOwner: UnavailableConnectionLifecycleOwner
 
   private lateinit var networkMonitor: NetworkMonitor
+  private val networkObserver = NetworkObserver()
 
   private val viewModel: MainViewModel by viewModels { viewModelFactory }
   private lateinit var binding: ActivityMainBinding
+  private var snackbar: Snackbar? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
     AndroidInjection.inject(this)
@@ -80,6 +88,7 @@ class MainActivity : AppCompatActivity() {
 
     networkMonitor = NetworkMonitor(this, lifecycle)
     lifecycle.addObserver(networkMonitor)
+    unavailableConnectionLifecycleOwner.addObserver(networkObserver)
 
     viewModel.loadingState.observe(this, Observer { uiLoadingState ->
       when (uiLoadingState) {
@@ -101,8 +110,9 @@ class MainActivity : AppCompatActivity() {
     viewModel.getRandomRecipe()
 
     networkMonitor.networkAvailableStateFlow.asLiveData().observe(this, Observer { networkState ->
-      if (networkState is NetworkState.Unavailable) {
-        showNetworkUnavailableAlert(R.string.network_is_unavailable)
+      when (networkState) {
+        NetworkState.Unavailable -> unavailableConnectionLifecycleOwner.onConnectionLost()
+        NetworkState.Available -> unavailableConnectionLifecycleOwner.onConnectionAvailable()
       }
     })
   }
@@ -153,12 +163,29 @@ class MainActivity : AppCompatActivity() {
   }
 
   private fun showNetworkUnavailableAlert(message: Int) {
-    Snackbar.make(binding.root, message, Snackbar.LENGTH_INDEFINITE)
+    snackbar = Snackbar.make(binding.root, message, Snackbar.LENGTH_INDEFINITE)
         .setAction(R.string.retry) {
           viewModel.getRandomRecipe()
         }.apply {
           view.setBackgroundColor(ContextCompat.getColor(this@MainActivity, R.color.colorPrimary))
           show()
         }
+  }
+
+  private fun removeNetworkUnavailableAlert() {
+    snackbar?.dismiss()
+  }
+
+  inner class NetworkObserver : LifecycleObserver {
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_START)
+    fun onNetworkUnavailable() {
+      showNetworkUnavailableAlert(R.string.network_is_unavailable)
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+    fun onNetworkAvailable() {
+      removeNetworkUnavailableAlert()
+    }
   }
 }
