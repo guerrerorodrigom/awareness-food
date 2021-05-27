@@ -41,6 +41,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
 import com.raywenderlich.android.awareness_food.databinding.FragmentFoodTriviaBinding
@@ -74,6 +75,10 @@ class FoodTriviaFragment : Fragment() {
         viewModel.getRandomFoodTrivia()
       }
     }
+
+    viewModel.foodTriviaState.observe(viewLifecycleOwner, Observer {
+      handleFoodTriviaApiState(it)
+    })
 
     viewModel.getRandomFoodTrivia()
   }
