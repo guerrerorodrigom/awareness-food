@@ -34,6 +34,7 @@
 
 package com.raywenderlich.android.awareness_food
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -41,7 +42,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
-import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
@@ -56,7 +56,6 @@ import com.raywenderlich.android.awareness_food.monitor.NetworkState
 import com.raywenderlich.android.awareness_food.monitor.UnavailableConnectionLifecycleOwner
 import com.raywenderlich.android.awareness_food.repositories.models.RecipeApiState
 import com.raywenderlich.android.awareness_food.viewmodels.MainViewModel
-import com.raywenderlich.android.awareness_food.viewmodels.UiLoadingState
 import com.raywenderlich.android.awareness_food.views.IngredientView
 import com.squareup.picasso.Picasso
 import dagger.android.AndroidInjection
@@ -90,16 +89,6 @@ class MainActivity : AppCompatActivity() {
     lifecycle.addObserver(networkMonitor)
     unavailableConnectionLifecycleOwner.addObserver(networkObserver)
 
-    viewModel.loadingState.observe(this, Observer { uiLoadingState ->
-      when (uiLoadingState) {
-        UiLoadingState.Loading -> {
-          clearViews()
-          binding.progressBar.isVisible = true
-        }
-        UiLoadingState.NotLoading -> binding.progressBar.isVisible = false
-      }
-    })
-
     viewModel.recipeState.observe(this, Observer {
       when (it) {
         RecipeApiState.Error -> showNetworkUnavailableAlert(R.string.error)
@@ -121,6 +110,10 @@ class MainActivity : AppCompatActivity() {
     R.id.menu_refresh -> {
       clearViews()
       viewModel.getRandomRecipe()
+      true
+    }
+    R.id.menu_trivia -> {
+      startActivity(Intent(this, FoodTriviaActivity::class.java))
       true
     }
     else -> super.onOptionsItemSelected(item)

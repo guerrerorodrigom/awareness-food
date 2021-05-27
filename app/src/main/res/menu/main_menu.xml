@@ -38,5 +38,11 @@
     android:id="@+id/menu_refresh"
     android:icon="@drawable/ic_refresh"
     android:title="@string/refresh"
-    app:showAsAction="always" />
+    app:showAsAction="ifRoom" />
+
+  <item
+    android:id="@+id/menu_trivia"
+    android:icon="@drawable/ic_trivia"
+    android:title="@string/food_trivia"
+    app:showAsAction="never" />
 </menu>

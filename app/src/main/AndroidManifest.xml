@@ -3,7 +3,6 @@
   xmlns:tools="http://schemas.android.com/tools"
   package="com.raywenderlich.android.awareness_food">
 
-  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
   <application
     android:name=".RecipesApplication"
     android:allowBackup="false"
@@ -13,18 +12,22 @@
     android:supportsRtl="true"
     android:theme="@style/AppTheme"
     tools:ignore="GoogleAppIndexingWarning">
-
+    <activity
+      android:name=".FoodTriviaActivity"
+      android:exported="true" />
     <!-- Main Activity -->
     <activity
       android:name=".MainActivity"
       android:theme="@style/SplashTheme">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
+
         <category android:name="android.intent.category.LAUNCHER" />
       </intent-filter>
     </activity>
-
   </application>
   <uses-permission android:name="android.permission.INTERNET" />
+
+  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
 </manifest>

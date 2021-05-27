@@ -36,6 +36,7 @@ package com.raywenderlich.android.awareness_food.di
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.raywenderlich.android.awareness_food.viewmodels.FoodTriviaViewModel
 import com.raywenderlich.android.awareness_food.viewmodels.MainViewModel
 import com.raywenderlich.android.awareness_food.viewmodels.ViewModelFactory
 import com.raywenderlich.android.awareness_food.viewmodels.ViewModelKey
@@ -50,6 +51,11 @@ abstract class ViewModelsModule {
   @IntoMap
   @ViewModelKey(MainViewModel::class)
   abstract fun bindMainViewModel(mainViewModel: MainViewModel): ViewModel
+
+  @Binds
+  @IntoMap
+  @ViewModelKey(FoodTriviaViewModel::class)
+  abstract fun bindFoodTriviaViewModel(foodTriviaViewModel: FoodTriviaViewModel): ViewModel
 
   @Binds
   abstract fun bindViewModelFactory(factory: ViewModelFactory): ViewModelProvider.Factory

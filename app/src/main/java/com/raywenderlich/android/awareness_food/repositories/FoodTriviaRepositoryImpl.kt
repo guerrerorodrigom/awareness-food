@@ -32,16 +32,35 @@
  * THE SOFTWARE.
  */
 
-package com.raywenderlich.android.awareness_food.network
+package com.raywenderlich.android.awareness_food.repositories
 
+import com.raywenderlich.android.awareness_food.network.RecipesService
+import com.raywenderlich.android.awareness_food.network.TriviaResponse
+import com.raywenderlich.android.awareness_food.repositories.models.FoodTriviaApiState
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import retrofit2.Response
-import retrofit2.http.GET
+import javax.inject.Inject
+import javax.inject.Singleton
 
-interface RecipesService {
+@Singleton
+class FoodTriviaRepositoryImpl @Inject constructor(
+    private val service: RecipesService
+) : FoodTriviaRepository {
+  override fun getRandomFoodTrivia(): Flow<FoodTriviaApiState> = flow {
+    val response = service.getFoodTrivia()
 
-  @GET("recipes/random?number=1")
-  suspend fun getRandomRecipe(): Response<RecipeResponse>
+    when {
+      isResponseSuccess(response) -> emit(FoodTriviaApiState.Result(response.body()!!.text))
+      else -> emit(FoodTriviaApiState.Error)
+    }
+  }.catch {
+    emit(FoodTriviaApiState.Error)
+  }.flowOn(Dispatchers.IO)
 
-  @GET("food/trivia/random")
-  suspend fun getFoodTrivia(): Response<TriviaResponse>
+  private fun isResponseSuccess(response: Response<TriviaResponse>) =
+      response.isSuccessful && response.body() != null && response.body()!!.text.isNotEmpty()
 }

@@ -39,4 +39,6 @@
   <dimen name="separator_margin_small">16dp</dimen>
   <dimen name="image_min_height">120dp</dimen>
   <dimen name="ingredient_image_min_size">32dp</dimen>
+  <dimen name="trivia_margin">16dp</dimen>
+  <dimen name="trivia_button_margin">8dp</dimen>
 </resources>

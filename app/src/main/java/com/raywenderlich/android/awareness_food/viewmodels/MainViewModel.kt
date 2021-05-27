@@ -34,6 +34,7 @@
 
 package com.raywenderlich.android.awareness_food.viewmodels
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -48,13 +49,13 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
 
   private val _recipeState = MutableLiveData<RecipeApiState>()
-  val recipeState: MutableLiveData<RecipeApiState>
+  val recipeState: LiveData<RecipeApiState>
     get() {
       return _recipeState
     }
 
   private val _loadingState = MutableLiveData<UiLoadingState>()
-  val loadingState: MutableLiveData<UiLoadingState>
+  val loadingState: LiveData<UiLoadingState>
     get() {
       return _loadingState
     }
