@@ -32,16 +32,25 @@
  * THE SOFTWARE.
  */
 
-package com.raywenderlich.android.awareness_food.network
+package com.raywenderlich.android.awareness_food
 
-import retrofit2.Response
-import retrofit2.http.GET
+import android.os.Bundle
+import android.view.MenuItem
+import androidx.appcompat.app.AppCompatActivity
 
-interface RecipesService {
+class FoodTriviaActivity : AppCompatActivity() {
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    setContentView(R.layout.activity_food_trivia)
 
-  @GET("recipes/random?number=1")
-  suspend fun getRandomRecipe(): Response<RecipeResponse>
+    supportActionBar?.setDisplayHomeAsUpEnabled(true)
+  }
 
-  @GET("food/trivia/random")
-  suspend fun getFoodTrivia(): Response<TriviaResponse>
+  override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
+    android.R.id.home -> {
+      finish()
+      true
+    }
+    else -> super.onOptionsItemSelected(item)
+  }
 }

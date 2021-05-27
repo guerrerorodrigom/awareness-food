@@ -34,6 +34,7 @@
 
 package com.raywenderlich.android.awareness_food.di
 
+import com.raywenderlich.android.awareness_food.FoodTriviaFragment
 import com.raywenderlich.android.awareness_food.MainActivity
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
@@ -43,4 +44,7 @@ abstract class AndroidModule {
 
   @ContributesAndroidInjector
   abstract fun mainActivity(): MainActivity
+
+  @ContributesAndroidInjector
+  abstract fun foodTriviaFragment(): FoodTriviaFragment
 }

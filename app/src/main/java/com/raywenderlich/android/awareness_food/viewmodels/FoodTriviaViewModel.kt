@@ -32,16 +32,33 @@
  * THE SOFTWARE.
  */
 
-package com.raywenderlich.android.awareness_food.network
+package com.raywenderlich.android.awareness_food.viewmodels
 
-import retrofit2.Response
-import retrofit2.http.GET
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.raywenderlich.android.awareness_food.repositories.FoodTriviaRepository
+import com.raywenderlich.android.awareness_food.repositories.models.FoodTriviaApiState
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-interface RecipesService {
+class FoodTriviaViewModel @Inject constructor(
+    private val repository: FoodTriviaRepository
+) : ViewModel() {
 
-  @GET("recipes/random?number=1")
-  suspend fun getRandomRecipe(): Response<RecipeResponse>
+  private val _foodTriviaState = MutableLiveData<FoodTriviaApiState>()
+  val foodTriviaState: LiveData<FoodTriviaApiState>
+    get() {
+      return _foodTriviaState
+    }
 
-  @GET("food/trivia/random")
-  suspend fun getFoodTrivia(): Response<TriviaResponse>
+  fun getRandomFoodTrivia() {
+    viewModelScope.launch {
+      repository.getRandomFoodTrivia().collect {
+        _foodTriviaState.value = it
+      }
+    }
+  }
 }
