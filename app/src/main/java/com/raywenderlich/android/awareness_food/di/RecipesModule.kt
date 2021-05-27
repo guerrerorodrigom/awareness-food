@@ -38,6 +38,8 @@ import android.content.Context
 import com.raywenderlich.android.awareness_food.analytics.AnalyticsEvents
 import com.raywenderlich.android.awareness_food.analytics.AnalyticsEventsImpl
 import com.raywenderlich.android.awareness_food.network.RecipesService
+import com.raywenderlich.android.awareness_food.repositories.FoodTriviaRepository
+import com.raywenderlich.android.awareness_food.repositories.FoodTriviaRepositoryImpl
 import com.raywenderlich.android.awareness_food.repositories.RecipeRepository
 import com.raywenderlich.android.awareness_food.repositories.RecipeRepositoryImpl
 import dagger.Module
@@ -78,6 +80,10 @@ class RecipesModule(val context: Context) {
   @Singleton
   @Provides
   fun providesRecipeRepository(recipesService: RecipesService): RecipeRepository = RecipeRepositoryImpl(recipesService)
+
+  @Singleton
+  @Provides
+  fun providesTriviaRepository(recipesService: RecipesService): FoodTriviaRepository = FoodTriviaRepositoryImpl(recipesService)
 
   @Singleton
   @Provides
