@@ -100,13 +100,7 @@ class MainActivity : AppCompatActivity() {
     })
 
     viewModel.loadingState.observe(this, Observer { uiLoadingState ->
-      when (uiLoadingState) {
-        UiLoadingState.Loading -> {
-          clearViews()
-          binding.progressBar.isVisible = true
-        }
-        UiLoadingState.NotLoading -> binding.progressBar.isVisible = false
-      }
+      handleLoadingState(uiLoadingState)
     })
 
     viewModel.getRandomRecipe()
@@ -176,6 +170,16 @@ class MainActivity : AppCompatActivity() {
           view.setBackgroundColor(ContextCompat.getColor(this@MainActivity, R.color.colorPrimary))
           show()
         }
+  }
+
+  private fun handleLoadingState(uiLoadingState: UiLoadingState?) {
+    when (uiLoadingState) {
+      UiLoadingState.Loading -> {
+        clearViews()
+        binding.progressBar.isVisible = true
+      }
+      UiLoadingState.NotLoading -> binding.progressBar.isVisible = false
+    }
   }
 
   private fun removeNetworkUnavailableAlert() {
