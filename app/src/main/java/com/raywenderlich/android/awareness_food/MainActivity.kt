@@ -42,6 +42,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
+import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
@@ -52,6 +53,7 @@ import com.raywenderlich.android.awareness_food.monitor.NetworkMonitor
 import com.raywenderlich.android.awareness_food.monitor.NetworkState
 import com.raywenderlich.android.awareness_food.repositories.models.RecipeApiState
 import com.raywenderlich.android.awareness_food.viewmodels.MainViewModel
+import com.raywenderlich.android.awareness_food.viewmodels.UiLoadingState
 import com.raywenderlich.android.awareness_food.views.IngredientView
 import com.squareup.picasso.Picasso
 import dagger.android.AndroidInjection
@@ -171,5 +173,15 @@ class MainActivity : AppCompatActivity() {
           view.setBackgroundColor(ContextCompat.getColor(this@MainActivity, R.color.colorPrimary))
           show()
         }
+  }
+
+  private fun handleLoadingState(uiLoadingState: UiLoadingState?) {
+    when (uiLoadingState) {
+      UiLoadingState.Loading -> {
+        clearViews()
+        binding.progressBar.isVisible = true
+      }
+      UiLoadingState.NotLoading -> binding.progressBar.isVisible = false
+    }
   }
 }
