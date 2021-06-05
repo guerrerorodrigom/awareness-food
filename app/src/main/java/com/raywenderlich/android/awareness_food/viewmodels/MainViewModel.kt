@@ -55,10 +55,6 @@ class MainViewModel @Inject constructor(
     }
 
   private val _loadingState = MutableLiveData<UiLoadingState>()
-  val loadingState: LiveData<UiLoadingState>
-    get() {
-      return _loadingState
-    }
 
   fun getRandomRecipe() {
     _loadingState.value = UiLoadingState.Loading
