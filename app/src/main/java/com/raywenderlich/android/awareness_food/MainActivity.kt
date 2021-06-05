@@ -106,10 +106,7 @@ class MainActivity : AppCompatActivity() {
     viewModel.getRandomRecipe()
 
     networkMonitor.networkAvailableStateFlow.asLiveData().observe(this, Observer { networkState ->
-      when (networkState) {
-        NetworkState.Unavailable -> unavailableConnectionLifecycleOwner.onConnectionLost()
-        NetworkState.Available -> unavailableConnectionLifecycleOwner.onConnectionAvailable()
-      }
+      handleNetworkState(networkState)
     })
   }
 
@@ -179,6 +176,13 @@ class MainActivity : AppCompatActivity() {
         binding.progressBar.isVisible = true
       }
       UiLoadingState.NotLoading -> binding.progressBar.isVisible = false
+    }
+  }
+
+  private fun handleNetworkState(networkState: NetworkState?) {
+    when (networkState) {
+      NetworkState.Unavailable -> unavailableConnectionLifecycleOwner.onConnectionLost()
+      NetworkState.Available -> unavailableConnectionLifecycleOwner.onConnectionAvailable()
     }
   }
 
