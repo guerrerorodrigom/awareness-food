@@ -86,7 +86,10 @@ class MainActivity : AppCompatActivity() {
     setContentView(binding.root)
 
     // Your code
-    networkMonitor = NetworkMonitor(this)
+    networkMonitor = NetworkMonitor(this, lifecycle)
+    lifecycle.addObserver(networkMonitor)
+
+    unavailableConnectionLifecycleOwner.addObserver(networkObserver)
 
     viewModel.recipeState.observe(this, Observer {
       when (it) {
@@ -96,24 +99,14 @@ class MainActivity : AppCompatActivity() {
 
     })
     viewModel.getRandomRecipe()
-    // 1.Network Monitor initialization.
-    networkMonitor.init()
 
     networkMonitor.networkAvailableStateFlow.asLiveData().observe(this, Observer { networkState ->
       handleNetworkState(networkState)
     })
-  }
 
-  // 2. Register network callback.
-  override fun onStart() {
-    super.onStart()
-    networkMonitor.registerNetworkCallback()
-  }
-
-  // 3. Unregister network callback.
-  override fun onStop() {
-    super.onStop()
-    networkMonitor.unregisterNetworkCallback()
+    viewModel.loadingState.observe(this, Observer { uiLoadingState ->
+      handleLoadingState(uiLoadingState)
+    })
   }
 
   override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
@@ -187,7 +180,8 @@ class MainActivity : AppCompatActivity() {
 
   private fun handleNetworkState(networkState: NetworkState?) {
     when (networkState) {
-      NetworkState.Unavailable -> showNetworkUnavailableAlert(R.string.network_is_unavailable)
+      NetworkState.Unavailable -> unavailableConnectionLifecycleOwner.onConnectionLost()
+      NetworkState.Available -> unavailableConnectionLifecycleOwner.onConnectionAvailable()
     }
   }
 
