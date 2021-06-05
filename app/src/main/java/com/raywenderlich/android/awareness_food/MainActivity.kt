@@ -43,14 +43,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.asLiveData
+import androidx.lifecycle.*
 import com.google.android.material.snackbar.Snackbar
 import com.raywenderlich.android.awareness_food.data.Recipe
 import com.raywenderlich.android.awareness_food.databinding.ActivityMainBinding
 import com.raywenderlich.android.awareness_food.monitor.NetworkMonitor
 import com.raywenderlich.android.awareness_food.monitor.NetworkState
+import com.raywenderlich.android.awareness_food.monitor.UnavailableConnectionLifecycleOwner
 import com.raywenderlich.android.awareness_food.repositories.models.RecipeApiState
 import com.raywenderlich.android.awareness_food.viewmodels.MainViewModel
 import com.raywenderlich.android.awareness_food.viewmodels.UiLoadingState
@@ -66,8 +65,11 @@ class MainActivity : AppCompatActivity() {
 
   @Inject
   lateinit var viewModelFactory: ViewModelProvider.Factory
+  @Inject
+  lateinit var unavailableConnectionLifecycleOwner: UnavailableConnectionLifecycleOwner
 
   private lateinit var networkMonitor: NetworkMonitor
+  private val networkObserver = NetworkObserver()
 
   private val viewModel: MainViewModel by viewModels { viewModelFactory }
   private lateinit var binding: ActivityMainBinding
@@ -98,9 +100,7 @@ class MainActivity : AppCompatActivity() {
     networkMonitor.init()
 
     networkMonitor.networkAvailableStateFlow.asLiveData().observe(this, Observer { networkState ->
-      when (networkState) {
-        NetworkState.Unavailable -> showNetworkUnavailableAlert(R.string.network_is_unavailable)
-      }
+      handleNetworkState(networkState)
     })
   }
 
@@ -182,6 +182,29 @@ class MainActivity : AppCompatActivity() {
         binding.progressBar.isVisible = true
       }
       UiLoadingState.NotLoading -> binding.progressBar.isVisible = false
+    }
+  }
+
+  private fun handleNetworkState(networkState: NetworkState?) {
+    when (networkState) {
+      NetworkState.Unavailable -> showNetworkUnavailableAlert(R.string.network_is_unavailable)
+    }
+  }
+
+  private fun removeNetworkUnavailableAlert() {
+    snackbar?.dismiss()
+  }
+
+  inner class NetworkObserver : LifecycleObserver {
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_START)
+    fun onNetworkUnavailable() {
+      showNetworkUnavailableAlert(R.string.network_is_unavailable)
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+    fun onNetworkAvailable() {
+      removeNetworkUnavailableAlert()
     }
   }
 }
